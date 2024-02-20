@@ -1,0 +1,51 @@
+pipeline{
+    agent any
+    tools{
+        maven 'maven-3.9.6'
+    }
+  
+    stages{
+        stage('GitHubPull'){
+            steps{
+            git branch: 'development', url: 'https://github.com/Poojitha-Gadhiraju/maven-web-application.git'
+        }
+        }
+        stage('Build'){
+         steps{
+         sh "mvn clean package"
+        }
+        }
+        stage("ExecuteSonarQubeReport"){
+         steps{
+            sh "mvn clean sonar:sonar"
+        }
+        }
+        stage("DeployToNexus"){
+         steps{
+            sh "mvn clean deploy"
+        }
+        }
+        stage('DeployToTomcat'){
+         steps{
+            sshagent(['33b347a9-08e9-477a-b2b2-b5f2f0cae79a']) {
+               sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@3.110.130.33:/opt/apache-tomcat-10.1.18/webapps/"
+}
+        }
+        }
+        
+    }
+    post{
+        success{
+            emailext body: '''Build is Success
+
+Regards,
+Poojitha''', subject: 'Build Success', to: 'poojithapooji520@gmail.com'
+        }
+        failure{
+            emailext body: '''Build is "FAILURE"
+
+Regards,
+Poojitha''', subject: 'Build Failure', to: 'poojithapooji520@gmail.com'
+        }
+    }
+}
