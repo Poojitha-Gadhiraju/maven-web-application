@@ -42,7 +42,7 @@ Regards,
 Poojitha''', subject: 'Build Success', to: 'poojithapooji520@gmail.com'
         }
         failure{
-            emailext body: '''Build is "FAILURE"
+            emailext body: '''Build is Failure
 
 Regards,
 Poojitha''', subject: 'Build Failure', to: 'poojithapooji520@gmail.com'
